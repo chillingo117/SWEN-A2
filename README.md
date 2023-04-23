@@ -3,11 +3,13 @@
 2. Make sure you have python installed. 
     -  Enter `py --version` and check that you have at least version 3.10.5 
 3. Activate the python virtual environment in this directory, open the command prompt in this directory and run
-    - `Scripts\activate`
+    - `Scripts\activate`, inserting this directory's path without the brackets
+    - `{ThisDirectory}\Scripts\activate`
     - This will start a local virtual environment for python development
     - You can leave this environment by entering `deactivate` in the CMD
     - See https://realpython.com/python-virtual-environments-a-primer/#activate-it for more
 4. Run `pip install -r requirements.txt`
     - This will install any python packages for this project
+    - Whenever you install a python package, don't forget to run `pip freeze > requirements.txt` to save package changes to the requirements.txt
     - See https://learnpython.com/blog/python-requirements-file/ for more
 
