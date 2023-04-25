@@ -1,9 +1,13 @@
 from flask import Flask
-from mysql.connector import (connection)
+from mysql.connector import connection, Error
 from dotenv import load_dotenv
 import os
 
 app = Flask(__name__)
+
+load_dotenv()
+CONN = connection.MySQLConnection(user='root', password=os.environ['SQL_PASSWORD'], database='VR1Family')
+CURSOR = CONN.cursor()
 
 @app.route("/")
 def hello_world():
@@ -11,15 +15,23 @@ def hello_world():
 
 @app.route("/test")
 def get_test():
-    load_dotenv()
-    password = os.environ['SQL_PASSWORD']
     try:
-        conn = connection.MySQLConnection(user='root', password=password, database='VR1Family')
-        cursor = conn.cursor()
         retrieveSql = '''
             select * from TestTable;
         '''
-        cursor.execute(retrieveSql)
-        return list(cursor)
-    except:
-        return 'error in query'
+        CURSOR.execute(retrieveSql)
+        return list(CURSOR)
+    except Error as e:
+        return e.msg
+
+
+@app.route("/categories")
+def get_categories():
+    try:
+        retrieveSql = '''
+            select * from AidCategories
+        '''
+        CURSOR.execute(retrieveSql)
+        return list(CURSOR)
+    except Error as e:
+        return e.msg

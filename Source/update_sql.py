@@ -2,8 +2,19 @@ from mysql.connector import connection, errorcode, Error
 from dotenv import load_dotenv
 import os
 
-def main():
-    load_dotenv()
+def executeSql(sqlString, sqlDescription, cursor, conn):
+    try:
+        print(sqlDescription)
+        cursor.execute(sqlString)
+        conn.commit()
+    except Error as err:
+        print(err.msg)
+        conn.rollback()
+    else:
+        print("OK")
+        conn.rollback()
+
+def ensureVR1FamilySchemaExists():
     password = os.environ['SQL_PASSWORD']
     conn = connection.MySQLConnection(user='root', password=password)
     cursor = conn.cursor()
@@ -11,21 +22,34 @@ def main():
     createDatabaseSql = ('''
         create database VR1Family;
     ''')
-
-    try:
-        print('Creating VR1Family database')
-        cursor.execute(createDatabaseSql)
-    except Error as err:
-            print(err.msg)
-    else:
-        print("OK")
+    sqlDescription = 'creating VR1Family database'
+    executeSql(createDatabaseSql, sqlDescription, cursor, conn)
 
     cursor.close()
     conn.close()
 
-    conn = connection.MySQLConnection(user='root', password='swen', database='VR1Family')
-    cursor = conn.cursor()
+def createAndPopulateCategoriesTable(cursor, conn):
+    createCategoriesTableSql = ('''
+        create table `AidCategories` (
+            `id` int not null auto_increment,
+            `name` nvarchar(50) unique,
+            primary key (`id`)
+        )
+    ''')
+    sqlDescription = 'Create AidCategories table'
+    executeSql(createCategoriesTableSql, sqlDescription, cursor, conn)
 
+    insertDefaultCategoriesSql = ("""
+        insert into `AidCategories` (`name`) values ('{name}')
+    """)
+    sqlDescription = 'Insert default category {} into AidCategories table'
+    defaultCategories = ['Dry Food Items', 'Hot Food Items', 'Personal Hygiene', 'Warm Clothing', 
+    'Casual Clothing', 'Bedding', 'Footwear', 'Electrical Supplies', 'Furniture Supplies']
+
+    for cat in defaultCategories:
+        executeSql(insertDefaultCategoriesSql.format(name=cat), sqlDescription.format(cat), cursor, conn)
+
+def createAndPopulateTestTable(cursor, conn):
     createTestTableSql = ( '''
         create table TestTable (
             id int,
@@ -33,27 +57,25 @@ def main():
             primary key (id)
         );
     ''')
+    sqlDescription = 'creating TestTable'
 
-    try:
-        print("Creating table TestTable")
-        cursor.execute(createTestTableSql)
-    except Error as err:
-        print(err.msg)
-    else:
-        print("OK")
+    executeSql(createTestTableSql, sqlDescription, cursor, conn)
 
     insertTestDataSql = ('''
-        insert into TestTable (id, test_col) values (%s, %s);
+        insert into TestTable (id, test_col) values ({}, '{}');
     ''')
+    sqlDescription='inserting test data'
+    executeSql(insertTestDataSql, sqlDescription, cursor, conn)
 
-    try:
-        print("Inserting test data")
-        cursor.execute(insertTestDataSql, (3, 'test'))
-        conn.commit() ##### DO NOT FORGET THIS #####
-    except Error as err:
-        print(err.msg)
-    else:
-        print("OK")
+def main():
+    load_dotenv()
+    ensureVR1FamilySchemaExists()
+
+    conn = connection.MySQLConnection(user='root', password=os.environ['SQL_PASSWORD'], database='VR1Family')
+    cursor = conn.cursor()
+
+    createAndPopulateTestTable(cursor, conn)
+    createAndPopulateCategoriesTable(cursor, conn)
 
     cursor.close()
     conn.close()
