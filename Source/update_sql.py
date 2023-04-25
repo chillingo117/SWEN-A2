@@ -49,6 +49,20 @@ def createAndPopulateCategoriesTable(cursor, conn):
     for cat in defaultCategories:
         executeSql(insertDefaultCategoriesSql.format(name=cat), sqlDescription.format(cat), cursor, conn)
 
+def createItemsTable(cursor, conn):
+    createItemsTableSql = ('''
+        create table `AidItems` (
+            `id` int not null auto_increment,
+            `name` nvarchar(50) unique,
+            `amount` int default 0,
+            `categoryId` int,
+            primary key (`id`),
+            foreign key (`categoryId`) references `AidCategories`(`id`)
+        )
+    ''')
+    sqlDescription = 'Create AidItems table'
+    executeSql(createItemsTableSql, sqlDescription, cursor, conn)
+
 def createAndPopulateTestTable(cursor, conn):
     createTestTableSql = ( '''
         create table TestTable (
@@ -76,6 +90,7 @@ def main():
 
     createAndPopulateTestTable(cursor, conn)
     createAndPopulateCategoriesTable(cursor, conn)
+    createItemsTable(cursor, conn)
 
     cursor.close()
     conn.close()
