@@ -36,3 +36,19 @@ def get_categories():
     except Error as e:
         return e.msg
 
+@categoriesApi.route("/category/<categoryId>/items", methods=['GET'])
+def get_category_items(categoryId):
+    try:
+        retrieveSql = f'''
+            select * from `AidItems` where `categoryId` = {categoryId}
+        '''
+        g.CURSOR.execute(retrieveSql)
+        
+        items = []
+        for (id, name, amount, categoryId) in g.CURSOR:
+            items.append({'id': id, 'name': name, 'amount': amount, 'categoryId': categoryId})
+
+        return items
+    except Error as e:
+        return e.msg
+
