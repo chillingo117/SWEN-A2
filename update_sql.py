@@ -45,7 +45,7 @@ def createAndPopulateCategoriesTable(cursor, conn):
         insert into `AidCategories` (`name`) values ('{name}')
     """)
     sqlDescription = 'Insert default category {} into AidCategories table'
-    defaultCategories = pd.read_csv(Path(__file__).parent / 'default_categories.csv')
+    defaultCategories = pd.read_csv(Path(__file__).parent / 'defaultData/default_categories.csv')
 
     for i, row in defaultCategories.iterrows():
         executeSql(insertDefaultCategoriesSql.format(name=row[0]), sqlDescription.format(row[0]), cursor, conn)
@@ -68,7 +68,7 @@ def createAndPopulateItemsTable(cursor, conn):
         insert into `AidItems` (`name`, `amount`, `categoryId`) values ('{name}', {amount}, {categoryId})
     """)
     sqlDescription = 'Inserting item into AidItems table'
-    defaultCategories = pd.read_csv(Path(__file__).parent / 'default_items.csv')
+    defaultCategories = pd.read_csv(Path(__file__).parent / 'defaultData/default_items.csv')
 
     for i, row in defaultCategories.iterrows():
         executeSql(insertDefaultItemsSql.format(name=row[0], amount=row[1], categoryId=row[2]), sqlDescription, cursor, conn)
