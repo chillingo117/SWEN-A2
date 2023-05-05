@@ -1,5 +1,7 @@
 from mysql.connector import connection, errorcode, Error
 from dotenv import load_dotenv
+from pathlib import Path
+import pandas as pd
 import os
 
 def executeSql(sqlString, sqlDescription, cursor, conn):
@@ -43,13 +45,12 @@ def createAndPopulateCategoriesTable(cursor, conn):
         insert into `AidCategories` (`name`) values ('{name}')
     """)
     sqlDescription = 'Insert default category {} into AidCategories table'
-    defaultCategories = ['Dry Food Items', 'Hot Food Items', 'Personal Hygiene', 'Warm Clothing', 
-    'Casual Clothing', 'Bedding', 'Footwear', 'Electrical Supplies', 'Furniture Supplies']
+    defaultCategories = pd.read_csv(Path(__file__).parent / 'default_categories.csv')
 
-    for cat in defaultCategories:
-        executeSql(insertDefaultCategoriesSql.format(name=cat), sqlDescription.format(cat), cursor, conn)
+    for i, row in defaultCategories.iterrows():
+        executeSql(insertDefaultCategoriesSql.format(name=row[0]), sqlDescription.format(row[0]), cursor, conn)
 
-def createItemsTable(cursor, conn):
+def createAndPopulateItemsTable(cursor, conn):
     createItemsTableSql = ('''
         create table `AidItems` (
             `id` int not null auto_increment,
@@ -62,6 +63,15 @@ def createItemsTable(cursor, conn):
     ''')
     sqlDescription = 'Create AidItems table'
     executeSql(createItemsTableSql, sqlDescription, cursor, conn)
+
+    insertDefaultItemsSql = ("""
+        insert into `AidItems` (`name`, `amount`, `categoryId`) values ('{name}', {amount}, {categoryId})
+    """)
+    sqlDescription = 'Inserting item into AidItems table'
+    defaultCategories = pd.read_csv(Path(__file__).parent / 'default_items.csv')
+
+    for i, row in defaultCategories.iterrows():
+        executeSql(insertDefaultItemsSql.format(name=row[0], amount=row[1], categoryId=row[2]), sqlDescription, cursor, conn)
 
 def createAndPopulateTestTable(cursor, conn):
     createTestTableSql = ( '''
@@ -90,7 +100,7 @@ def main():
 
     createAndPopulateTestTable(cursor, conn)
     createAndPopulateCategoriesTable(cursor, conn)
-    createItemsTable(cursor, conn)
+    createAndPopulateItemsTable(cursor, conn)
 
     cursor.close()
     conn.close()
