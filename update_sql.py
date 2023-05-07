@@ -51,7 +51,7 @@ def createAndPopulateCategoriesTable(cursor, conn):
     createCategoriesTableSql = ('''
         create table `AidCategories` (
             `id` int not null auto_increment,
-            `name` nvarchar(50) unique,
+            `name` nvarchar(50) unique not null,
             primary key (`id`)
         )
     ''')
@@ -71,9 +71,9 @@ def createAndPopulateItemsTable(cursor, conn):
     createItemsTableSql = ('''
         create table `AidItems` (
             `id` int not null auto_increment,
-            `name` nvarchar(50) unique,
-            `amount` int default 0,
-            `categoryId` int,
+            `name` nvarchar(50) unique not null,
+            `amount` int not null default 0,
+            `categoryId` int not null,
             primary key (`id`),
             foreign key (`categoryId`) references `AidCategories`(`id`)
         )
@@ -114,9 +114,10 @@ def createAndPopulateDistributionTable(cursor, conn):
     createDistributionTableSql = ('''
         create table `Distribution` (
             `id` int not null auto_increment,
-            `itemId` int,
-            `quantity` int,
-            `date` datetime,
+            `itemId` int not null,
+            `quantity` int not null,
+            `note` nvarchar(4000) default "",
+            `date` datetime not null,
             primary key (`id`),
             foreign key (`itemId`) references `AidItems`(`id`)
         )

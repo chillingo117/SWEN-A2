@@ -9,10 +9,11 @@ from api.categoriesApi import categoriesApi
 from api.itemsApi import itemsApi
 from api.kitsApi import kitsApi
 from api.dashboardApi import dashboardApi
+from api.requisitionsApi import requisitionsApi
 
 api = Blueprint('api', __name__,  template_folder='templates')
 api.register_blueprint(categoriesApi)
 api.register_blueprint(itemsApi)
 api.register_blueprint(kitsApi)
 api.register_blueprint(dashboardApi)
-
+api.register_blueprint(requisitionsApi)
