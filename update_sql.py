@@ -112,6 +112,30 @@ def createAndPopulateKitsTable(cursor, conn):
     for i, row in defaultKits.iterrows():
         executeSql(insertDefaultKitsSql.format(name=row[0]), sqlDescription.format(row[0]), cursor, conn)
 
+def createAndPopulateKitItemRelationshipTable(cursor, conn):
+    createTableSql = ('''
+        create table `KitItemRelationship` (
+            `id` int not null auto_increment,
+            `itemId` int not null,
+            `kitId` int not null,
+            `quantity` int not null,
+            primary key (`id`),
+            foreign key (`itemId`) references `AidItems`(`id`),
+            foreign key (`kitId`) references `Kits`(`id`)
+        )
+    ''')
+    sqlDescription = 'Create Kits table'
+    executeSql(createTableSql, sqlDescription, cursor, conn)
+
+    insertDefaultsSql = ("""
+        insert into `KitItemRelationship` (`itemId`, `kitId`, `quantity`) values ('{itemId}', '{kitId}', '{quantity}')
+    """)
+    sqlDescription = 'Insert default relationship to kits item relations table'
+    defaultRelations = pd.read_csv(Path(__file__).parent / 'defaultData/default_kit-item_relationships.csv')
+
+    for i, row in defaultRelations.iterrows():
+        executeSql(insertDefaultsSql.format(itemId=row[0], kitId=row[1], quantity=row[2]), sqlDescription, cursor, conn)
+
 def createAndPopulateRequisitionsTable(cursor, conn):
     createRequistionsTableSql = ('''
         create table `Requisitions` (
@@ -244,6 +268,7 @@ def main():
     createAndPopulateOrganizationTable(cursor, conn)
     createAndPopulateDonorsTable(cursor, conn)
     createAndPopulateRecipientsTable(cursor, conn)
+    createAndPopulateKitItemRelationshipTable(cursor, conn)
 
     cursor.close()
     conn.close()

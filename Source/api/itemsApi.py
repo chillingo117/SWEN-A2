@@ -13,7 +13,7 @@ def get_items():
     itemsApi = []
     try:
         retrieveSql = '''
-            select * from `AidItems`
+            select id, name, amount, categoryId from `AidItems`
         '''
         g.CURSOR.execute(retrieveSql)
 
