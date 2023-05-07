@@ -16,6 +16,20 @@ def executeSql(sqlString, sqlDescription, cursor, conn):
         print("OK")
         conn.rollback()
 
+def dropDatabase():
+    password = os.environ['SQL_PASSWORD']
+    conn = connection.MySQLConnection(user='root', password=password)
+    cursor = conn.cursor()
+
+    dropDatabaseSql = ('''
+        drop database if exists VR1Family
+    ''')
+    executeSql(dropDatabaseSql, "Dropping database", cursor, conn)
+
+    cursor.close()
+    conn.close()
+
+
 def ensureVR1FamilySchemaExists():
     password = os.environ['SQL_PASSWORD']
     conn = connection.MySQLConnection(user='root', password=password)
@@ -73,32 +87,35 @@ def createAndPopulateItemsTable(cursor, conn):
     for i, row in defaultCategories.iterrows():
         executeSql(insertDefaultItemsSql.format(name=row[0], amount=row[1], categoryId=row[2]), sqlDescription, cursor, conn)
 
-def createAndPopulateTestTable(cursor, conn):
-    createTestTableSql = ( '''
-        create table TestTable (
-            id int,
-            test_col varchar(10),
-            primary key (id)
-        );
+def createAndPopulateKitsTable(cursor, conn):
+    createKitsTableSql = ('''
+        create table `Kits` (
+            `id` int not null auto_increment,
+            `name` nvarchar(50) unique,
+            primary key (`id`)
+        )
     ''')
-    sqlDescription = 'creating TestTable'
+    sqlDescription = 'Create Kits table'
+    executeSql(createKitsTableSql, sqlDescription, cursor, conn)
 
-    executeSql(createTestTableSql, sqlDescription, cursor, conn)
+    insertDefaultKitsSql = ("""
+        insert into `Kits` (`name`) values ('{name}')
+    """)
+    sqlDescription = 'Insert default kit {} into Kits table'
+    defaultKits = pd.read_csv(Path(__file__).parent / 'defaultData/default_kits.csv')
 
-    insertTestDataSql = ('''
-        insert into TestTable (id, test_col) values ({}, '{}');
-    ''')
-    sqlDescription='inserting test data'
-    executeSql(insertTestDataSql, sqlDescription, cursor, conn)
+    for i, row in defaultKits.iterrows():
+        executeSql(insertDefaultKitsSql.format(name=row[0]), sqlDescription.format(row[0]), cursor, conn)
 
 def main():
     load_dotenv()
+    dropDatabase()
     ensureVR1FamilySchemaExists()
 
     conn = connection.MySQLConnection(user='root', password=os.environ['SQL_PASSWORD'], database='VR1Family')
     cursor = conn.cursor()
 
-    createAndPopulateTestTable(cursor, conn)
+    createAndPopulateKitsTable(cursor, conn)
     createAndPopulateCategoriesTable(cursor, conn)
     createAndPopulateItemsTable(cursor, conn)
 

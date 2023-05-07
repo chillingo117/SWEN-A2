@@ -19,6 +19,7 @@ def connect():
 
 @app.after_request
 def disconnect(response):
+    g.CONN.commit()
     g.CURSOR.close()
     g.CONN.close()
     return response

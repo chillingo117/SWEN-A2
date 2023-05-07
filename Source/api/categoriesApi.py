@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, g
+from flask import Flask, Blueprint, g, request
 from flask_cors import CORS
 from mysql.connector import connection, Error
 from dotenv import load_dotenv
@@ -52,3 +52,17 @@ def get_category_items(categoryId):
     except Error as e:
         return e.msg
 
+
+
+@categoriesApi.route("/categories/create", methods=['POST'])
+def create_category():
+    try:
+        name = request.json.get('name')
+        retrieveSql = f'''
+            insert into `AidCategories` (`name`) values ('{name}')
+        '''
+        g.CURSOR.execute(retrieveSql)
+        
+        return name
+    except Error as e:
+        return e.msg
