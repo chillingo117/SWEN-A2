@@ -21,11 +21,11 @@ def make_requisition():
 
         if isSelectingKit:
             insertSql = f'''
-                insert into `Distribution` (`kitId`, `quantity`, `note`, `date`) values ({selectedId}, {quantity}, '{note}', '{date}')
+                insert into `Requisitions` (`kitId`, `quantity`, `note`, `date`) values ({selectedId}, {quantity}, '{note}', '{date}')
             '''
         else:
             insertSql = f'''
-                insert into `Distribution` (`itemId`, `quantity`, `note`, `date`) values ({selectedId}, {quantity}, '{note}', '{date}')
+                insert into `Requisitions` (`itemId`, `quantity`, `note`, `date`) values ({selectedId}, {quantity}, '{note}', '{date}')
             '''
         g.CURSOR.execute(insertSql)
         

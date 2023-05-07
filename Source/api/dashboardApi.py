@@ -15,12 +15,12 @@ def get_top5():
         retrieveSql = '''
             select
                 AC.name as `label`,
-                sum(D.quantity) as `num`
-            from `Distribution` D 
-                left join `AidItems` AI on D.itemId = AI.id             
+                sum(R.quantity) as `num`
+            from `Requisitions` R 
+                left join `AidItems` AI on R.itemId = AI.id             
                 left join `AidCategories` AC on AI.categoryId = AC.id 
                 
-            where D.date > date_add(CURDATE(), interval -90 day)
+            where R.date > date_add(CURDATE(), interval -90 day)
             group by AC.id
             order by num desc
             limit 5;

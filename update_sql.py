@@ -111,9 +111,9 @@ def createAndPopulateKitsTable(cursor, conn):
     for i, row in defaultKits.iterrows():
         executeSql(insertDefaultKitsSql.format(name=row[0]), sqlDescription.format(row[0]), cursor, conn)
 
-def createAndPopulateDistributionTable(cursor, conn):
-    createDistributionTableSql = ('''
-        create table `Distribution` (
+def createAndPopulateRequisitionsTable(cursor, conn):
+    createRequistionsTableSql = ('''
+        create table `Requisitions` (
             `id` int not null auto_increment,
             `itemId` int,
             `kitId` int,
@@ -124,16 +124,16 @@ def createAndPopulateDistributionTable(cursor, conn):
             foreign key (`itemId`) references `AidItems`(`id`)
         )
     ''')
-    sqlDescription = 'Create Distribution table'
-    executeSql(createDistributionTableSql, sqlDescription, cursor, conn)
+    sqlDescription = 'Create Requistions table'
+    executeSql(createRequistionsTableSql, sqlDescription, cursor, conn)
 
-    insertDefaultDistributionSql = ("""
-        insert into `Distribution` (`itemId`, `kitId`, `quantity`, `date`) values ({itemId}, {kitId}, {quantity}, '{date}')
+    insertDefaultRequistionsSql = ("""
+        insert into `Requisitions` (`itemId`, `kitId`, `quantity`, `date`) values ({itemId}, {kitId}, {quantity}, '{date}')
     """)
-    sqlDescription = 'Insert default distribution into Distribution table'
-    defaultdistributions = pd.read_csv(Path(__file__).parent / 'defaultData/default_distributions.csv')
+    sqlDescription = 'Insert default Requistions into Requistions table'
+    defaultRequistions = pd.read_csv(Path(__file__).parent / 'defaultData/default_requisitions.csv')
 
-    for i, row in defaultdistributions.iterrows():
+    for i, row in defaultRequistions.iterrows():
         itemId = row[0]
         if(math.isnan(itemId)):
             itemId = 'NULL'
@@ -143,7 +143,91 @@ def createAndPopulateDistributionTable(cursor, conn):
         date = datetime.now() - timedelta(days=random.randint(1, 90))
         date = date.isoformat()
 
-        executeSql(insertDefaultDistributionSql.format(itemId=itemId, kitId=kitId, quantity=random.randint(1, 20), date=date), sqlDescription.format(row[0]), cursor, conn)
+        executeSql(insertDefaultRequistionsSql.format(itemId=itemId, kitId=kitId, quantity=random.randint(1, 20), date=date), sqlDescription, cursor, conn)
+
+def createAndPopulateOrganizationTable(cursor, conn):
+    createTableSql = ('''
+        create table `Organizations` (
+            `id` int not null auto_increment,
+            `contactEmail` nvarchar(4000) not null,
+            `contactName` nvarchar(4000) not null,
+            `contactPhone` int not null,
+            `organizationAddress` nvarchar(4000) not null,
+            `organizationName` nvarchar(4000) not null,
+            primary key (`id`)
+        )
+    ''')
+    sqlDescription = 'Create Organization info table'
+    executeSql(createTableSql, sqlDescription, cursor, conn)
+
+    insertDefaultSql = ("""
+        insert into `Organizations` (`contactEmail`, `contactName`, `contactPhone`, `organizationAddress`, `organizationName`) values ('{contactEmail}', '{contactName}', '{contactPhone}', '{organizationAddress}', '{organizationName}')
+    """)
+    sqlDescription = 'Insert default org into organization table'
+    defaultOrganizations = pd.read_csv(Path(__file__).parent / 'defaultData/default_organizations.csv')
+
+    for i, row in defaultOrganizations.iterrows():
+        executeSql(insertDefaultSql.format(contactEmail=row[0], contactName=row[1], contactPhone=row[2], organizationAddress=row[3], organizationName=row[4]), sqlDescription, cursor, conn)
+
+def createAndPopulateDonorsTable(cursor, conn):
+    createTableSql = ('''
+        create table `Donors` (
+            `id` int not null auto_increment,
+            `name` nvarchar(4000) not null,
+            `age` int not null,
+            `address` nvarchar(4000) not null,
+            `email` nvarchar(4000) not null,
+            `phone` int not null,
+            `preferredCommunication` nvarchar(4000) not null,
+            primary key (`id`)
+        )
+    ''')
+    sqlDescription = 'Create Donors info table'
+    executeSql(createTableSql, sqlDescription, cursor, conn)
+
+    insertDefaultSql = ("""
+        insert into `Donors` (`name`, `age`, `address`, `email`, `phone`, `preferredCommunication`) values ('{name}', '{age}', '{address}', '{email}', '{phone}', '{preferredCommunication}')
+    """)
+    sqlDescription = 'Insert default donor into Donors table'
+    defaultOrganizations = pd.read_csv(Path(__file__).parent / 'defaultData/default_donors.csv')
+
+    for i, row in defaultOrganizations.iterrows():
+        executeSql(insertDefaultSql.format(name=row[0], age=row[1], address=row[2], email=row[3], phone=row[4], preferredCommunication=row[5]), sqlDescription, cursor, conn)
+
+def createAndPopulateRecipientsTable(cursor, conn):
+    createTableSql = ('''
+        create table `Recipients` (
+            `id` int not null auto_increment,
+            `age` int not null,
+            `name` nvarchar(300) not null,
+            `phone` int not null,
+            `email` nvarchar(4000) not null,
+            `address` nvarchar(4000) not null,
+            `familySize` int,
+            `partnerAge` int,
+            `partnerName` nvarchar(300),
+            `kid1Age` int,
+            `kid1Name` nvarchar(300),
+            `kid2Age` int,
+            `kid2Name` nvarchar(300),
+            `kid3Age` int,
+            `kid3Name` nvarchar(300),
+            primary key (`id`)
+        )
+    ''')
+    sqlDescription = 'Create Recipients info table'
+    executeSql(createTableSql, sqlDescription, cursor, conn)
+
+    insertDefaultSql = ("""
+        insert into `Recipients` (`age`, `name`, `phone`, `email`, `address`, `familySize`, `partnerAge`, `partnerName`, `kid1Age`, `kid1Name`, `kid2Age`, `kid2Name`, `kid3Age`, `kid3Name`) 
+        values ({randAge}, '{name}', {randNum}, '{email}', '{address}', {randFamSize}, {randAge}, '{partnerName}', {randKidAge}, '{kid1Name}', {randKidAge}, '{kid2Name}', {randKidAge}, '{kid3Name}' )
+    """)
+    sqlDescription = 'Insert default Recipient into Recipients table'
+    defaultOrganizations = pd.read_csv(Path(__file__).parent / 'defaultData/default_recipients.csv')
+
+    for i, row in defaultOrganizations.iterrows():
+        executeSql(insertDefaultSql.format(randAge='RAND()*(50-30)+30', randNum='RAND()*(999999-111111)+1111111', randFamSize='RAND()*(999999-111111)+1111111', randKidAge='RAND()*(10-1)+1', name=row[0], email=row[1], address=row[2], partnerName=row[3], kid1Name=row[4], kid2Name=row[5], kid3Name=row[6]), sqlDescription, cursor, conn)
+
 
 def main():
     load_dotenv()
@@ -156,7 +240,10 @@ def main():
     createAndPopulateKitsTable(cursor, conn)
     createAndPopulateCategoriesTable(cursor, conn)
     createAndPopulateItemsTable(cursor, conn)
-    createAndPopulateDistributionTable(cursor, conn)
+    createAndPopulateRequisitionsTable(cursor, conn)
+    createAndPopulateOrganizationTable(cursor, conn)
+    createAndPopulateDonorsTable(cursor, conn)
+    createAndPopulateRecipientsTable(cursor, conn)
 
     cursor.close()
     conn.close()
