@@ -75,6 +75,7 @@ def createAndPopulateItemsTable(cursor, conn):
             `name` nvarchar(50) unique not null,
             `amount` int not null default 0,
             `categoryId` int not null,
+            `extraInfo` nvarchar(4000) default '',
             primary key (`id`),
             foreign key (`categoryId`) references `AidCategories`(`id`)
         )
@@ -89,7 +90,7 @@ def createAndPopulateItemsTable(cursor, conn):
     defaultCategories = pd.read_csv(Path(__file__).parent / 'defaultData/default_items.csv')
 
     for i, row in defaultCategories.iterrows():
-        executeSql(insertDefaultItemsSql.format(name=row[0], amount=random.randint(0, 120), categoryId=row[1]), sqlDescription, cursor, conn)
+        executeSql(insertDefaultItemsSql.format(name=row[0], amount=random.randint(0, 100), categoryId=row[1]), sqlDescription, cursor, conn)
 
 def createAndPopulateKitsTable(cursor, conn):
     createKitsTableSql = ('''
@@ -227,7 +228,6 @@ def createAndPopulateRecipientsTable(cursor, conn):
 
     for i, row in defaultOrganizations.iterrows():
         executeSql(insertDefaultSql.format(randAge='RAND()*(50-30)+30', randNum='RAND()*(999999-111111)+1111111', randFamSize='RAND()*(999999-111111)+1111111', randKidAge='RAND()*(10-1)+1', name=row[0], email=row[1], address=row[2], partnerName=row[3], kid1Name=row[4], kid2Name=row[5], kid3Name=row[6]), sqlDescription, cursor, conn)
-
 
 def main():
     load_dotenv()
