@@ -199,10 +199,10 @@ def createAndPopulateDonorsTable(cursor, conn):
         create table `Donors` (
             `id` int not null auto_increment,
             `name` nvarchar(4000) not null,
-            `age` int not null,
-            `address` nvarchar(4000) not null,
-            `email` nvarchar(4000) not null,
-            `phone` int not null,
+            `age` int,
+            `address` nvarchar(4000),
+            `email` nvarchar(4000),
+            `phone` int,
             `preferredCommunication` nvarchar(4000) not null,
             primary key (`id`)
         )
@@ -253,6 +253,34 @@ def createAndPopulateRecipientsTable(cursor, conn):
     for i, row in defaultOrganizations.iterrows():
         executeSql(insertDefaultSql.format(randAge='RAND()*(50-30)+30', randNum='RAND()*(999999-111111)+1111111', randFamSize='RAND()*(999999-111111)+1111111', randKidAge='RAND()*(10-1)+1', name=row[0], email=row[1], address=row[2], partnerName=row[3], kid1Name=row[4], kid2Name=row[5], kid3Name=row[6]), sqlDescription, cursor, conn)
 
+def createAndPopulateAcquisitionsTable(cursor, conn):
+    createAcquistionsTableSql = ('''
+        create table `Acquisitions` (
+            `id` int not null auto_increment,
+            `itemId` int not null,
+            `donorId` int not null,
+            `quantity` int not null,
+            `date` datetime not null,
+            primary key (`id`),
+            foreign key (`itemId`) references `AidItems`(`id`),
+            foreign key (`donorId`) references `Donors`(`id`)
+        )
+    ''')
+    sqlDescription = 'Create Acquistions table'
+    executeSql(createAcquistionsTableSql, sqlDescription, cursor, conn)
+
+    insertDefaultAcquistionsSql = ("""
+        insert into `Acquisitions` (`itemId`, `donorId`, `quantity`, `date`) values ({itemId}, {donorId}, {quantity}, '{date}')
+    """)
+    sqlDescription = 'Insert default Acquistions into acquistions table'
+    defaultacquistions = pd.read_csv(Path(__file__).parent / 'defaultData/default_acquisitions.csv')
+
+    for i, row in defaultacquistions.iterrows():
+        date = datetime.now() - timedelta(days=random.randint(1, 90))
+        date = date.isoformat()
+
+        executeSql(insertDefaultAcquistionsSql.format(itemId=row[0], donorId=row[1], quantity=random.randint(1, 20), date=date), sqlDescription, cursor, conn)
+
 def main():
     load_dotenv()
     dropDatabase()
@@ -269,6 +297,7 @@ def main():
     createAndPopulateDonorsTable(cursor, conn)
     createAndPopulateRecipientsTable(cursor, conn)
     createAndPopulateKitItemRelationshipTable(cursor, conn)
+    createAndPopulateAcquisitionsTable(cursor, conn)
 
     cursor.close()
     conn.close()
