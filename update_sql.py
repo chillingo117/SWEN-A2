@@ -1,8 +1,12 @@
 from mysql.connector import connection, errorcode, Error
 from dotenv import load_dotenv
 from pathlib import Path
+import random
+from datetime import datetime, timedelta
 import pandas as pd
 import os
+
+random.seed(1000)
 
 def executeSql(sqlString, sqlDescription, cursor, conn):
     try:
@@ -28,7 +32,6 @@ def dropDatabase():
 
     cursor.close()
     conn.close()
-
 
 def ensureVR1FamilySchemaExists():
     password = os.environ['SQL_PASSWORD']
@@ -85,7 +88,7 @@ def createAndPopulateItemsTable(cursor, conn):
     defaultCategories = pd.read_csv(Path(__file__).parent / 'defaultData/default_items.csv')
 
     for i, row in defaultCategories.iterrows():
-        executeSql(insertDefaultItemsSql.format(name=row[0], amount=row[1], categoryId=row[2]), sqlDescription, cursor, conn)
+        executeSql(insertDefaultItemsSql.format(name=row[0], amount=random.randint(0, 120), categoryId=row[1]), sqlDescription, cursor, conn)
 
 def createAndPopulateKitsTable(cursor, conn):
     createKitsTableSql = ('''
@@ -107,6 +110,31 @@ def createAndPopulateKitsTable(cursor, conn):
     for i, row in defaultKits.iterrows():
         executeSql(insertDefaultKitsSql.format(name=row[0]), sqlDescription.format(row[0]), cursor, conn)
 
+def createAndPopulateDistributionTable(cursor, conn):
+    createDistributionTableSql = ('''
+        create table `Distribution` (
+            `id` int not null auto_increment,
+            `itemId` int,
+            `quantity` int,
+            `date` datetime,
+            primary key (`id`),
+            foreign key (`itemId`) references `AidItems`(`id`)
+        )
+    ''')
+    sqlDescription = 'Create Distribution table'
+    executeSql(createDistributionTableSql, sqlDescription, cursor, conn)
+
+    insertDefaultDistributionSql = ("""
+        insert into `Distribution` (`itemId`, `quantity`, `date`) values ('{itemId}', {quantity}, '{date}')
+    """)
+    sqlDescription = 'Insert default distribution into Distribution table'
+    defaultdistributions = pd.read_csv(Path(__file__).parent / 'defaultData/default_distributions.csv')
+
+    for i, row in defaultdistributions.iterrows():
+        date = datetime.now() - timedelta(days=random.randint(1, 90))
+        date = date.isoformat()
+        executeSql(insertDefaultDistributionSql.format(itemId=row[0], quantity=random.randint(1, 20), date=date), sqlDescription.format(row[0]), cursor, conn)
+
 def main():
     load_dotenv()
     dropDatabase()
@@ -118,6 +146,7 @@ def main():
     createAndPopulateKitsTable(cursor, conn)
     createAndPopulateCategoriesTable(cursor, conn)
     createAndPopulateItemsTable(cursor, conn)
+    createAndPopulateDistributionTable(cursor, conn)
 
     cursor.close()
     conn.close()
