@@ -281,6 +281,29 @@ def createAndPopulateAcquisitionsTable(cursor, conn):
 
         executeSql(insertDefaultAcquistionsSql.format(itemId=row[0], donorId=row[1], quantity=random.randint(1, 20), date=date), sqlDescription, cursor, conn)
 
+def createAndPopulatePasswordTable(cursor, conn):
+    createTableSql = ('''
+        create table `Passwords` (
+            `password` nvarchar(20) not null,
+            `profile` nvarchar(20) not null
+        )
+    ''')
+    sqlDescription = 'Create Passwords table'
+    executeSql(createTableSql, sqlDescription, cursor, conn)
+
+    insertDefaultLoginsSql = ("""
+        insert into `Passwords` (`password`, `profile`) values ('admin', 'admin')
+    """)
+    sqlDescription = 'Insert default Acquistions into acquistions table'
+    executeSql(insertDefaultLoginsSql, sqlDescription, cursor, conn)
+
+    insertDefaultLoginsSql = ("""
+        insert into `Passwords` (`password`, `profile`) values ('user', 'user')
+    """)
+    sqlDescription = 'Insert default Acquistions into acquistions table'
+    executeSql(insertDefaultLoginsSql, sqlDescription, cursor, conn)
+
+
 def main():
     load_dotenv()
     dropDatabase()
@@ -298,6 +321,7 @@ def main():
     createAndPopulateRecipientsTable(cursor, conn)
     createAndPopulateKitItemRelationshipTable(cursor, conn)
     createAndPopulateAcquisitionsTable(cursor, conn)
+    createAndPopulatePasswordTable(cursor, conn)
 
     cursor.close()
     conn.close()
