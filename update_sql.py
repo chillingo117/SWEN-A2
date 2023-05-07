@@ -2,6 +2,7 @@ from mysql.connector import connection, errorcode, Error
 from dotenv import load_dotenv
 from pathlib import Path
 import random
+import math
 from datetime import datetime, timedelta
 import pandas as pd
 import os
@@ -114,7 +115,8 @@ def createAndPopulateDistributionTable(cursor, conn):
     createDistributionTableSql = ('''
         create table `Distribution` (
             `id` int not null auto_increment,
-            `itemId` int not null,
+            `itemId` int,
+            `kitId` int,
             `quantity` int not null,
             `note` nvarchar(4000) default "",
             `date` datetime not null,
@@ -126,15 +128,22 @@ def createAndPopulateDistributionTable(cursor, conn):
     executeSql(createDistributionTableSql, sqlDescription, cursor, conn)
 
     insertDefaultDistributionSql = ("""
-        insert into `Distribution` (`itemId`, `quantity`, `date`) values ('{itemId}', {quantity}, '{date}')
+        insert into `Distribution` (`itemId`, `kitId`, `quantity`, `date`) values ({itemId}, {kitId}, {quantity}, '{date}')
     """)
     sqlDescription = 'Insert default distribution into Distribution table'
     defaultdistributions = pd.read_csv(Path(__file__).parent / 'defaultData/default_distributions.csv')
 
     for i, row in defaultdistributions.iterrows():
+        itemId = row[0]
+        if(math.isnan(itemId)):
+            itemId = 'NULL'
+        kitId = row[1]
+        if(math.isnan(kitId)):
+            kitId = 'NULL'
         date = datetime.now() - timedelta(days=random.randint(1, 90))
         date = date.isoformat()
-        executeSql(insertDefaultDistributionSql.format(itemId=row[0], quantity=random.randint(1, 20), date=date), sqlDescription.format(row[0]), cursor, conn)
+
+        executeSql(insertDefaultDistributionSql.format(itemId=itemId, kitId=kitId, quantity=random.randint(1, 20), date=date), sqlDescription.format(row[0]), cursor, conn)
 
 def main():
     load_dotenv()

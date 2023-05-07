@@ -11,14 +11,22 @@ requisitionsApi = Blueprint('requisitionsApi', __name__,  template_folder='templ
 @requisitionsApi.route("/requisition", methods=['POST'])
 def make_requisition():
     try:
-        itemId = request.json.get('itemId')
+        selectedId = request.json.get('selectedId')
         quantity = request.json.get('quantity')
         note = request.json.get('note')
+        isSelectingKit = request.json.get('isSelectingKit')
         date = datetime.now().isoformat()
 
-        insertSql = f'''
-            insert into `Distribution` (`itemId`, `quantity`, `note`, `date`) values ({itemId}, {quantity}, '{note}', '{date}')
-        '''
+        insertSql = ''
+
+        if isSelectingKit:
+            insertSql = f'''
+                insert into `Distribution` (`kitId`, `quantity`, `note`, `date`) values ({selectedId}, {quantity}, '{note}', '{date}')
+            '''
+        else:
+            insertSql = f'''
+                insert into `Distribution` (`itemId`, `quantity`, `note`, `date`) values ({selectedId}, {quantity}, '{note}', '{date}')
+            '''
         g.CURSOR.execute(insertSql)
         
         return ''
