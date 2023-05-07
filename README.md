@@ -13,7 +13,7 @@
     - See https://learnpython.com/blog/python-requirements-file/ for more
 4. Follow instructions on https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/windows-installation.html to install mysql locally.
     - When setting the password for the root user, add it to the `.env` file as `SQL_PASSWORD={insert password here}`
-6. Run `source/update_sql.py`
+6. Run `py update_sql.py`
     - This will attempt a sql connection and setup a database and insert some test data
 5. Run `flask run`
     - This should start the flask server
