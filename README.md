@@ -11,14 +11,23 @@
     - Run `pip install -r requirements.txt`, this will install any python packages for this project
     - Whenever you install a python package, run `pip freeze > requirements.txt` to save package changes to the requirements.txt
     - See https://learnpython.com/blog/python-requirements-file/ for more
+
 4. Follow instructions on https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/windows-installation.html to install mysql locally.
-    - When setting the password for the root user, add it to the `.env` file as `SQL_PASSWORD={insert password here}`
+    - Remember the password you use for the root user.
+5. Add a file called `.env` to the root foler of `SWEN-A2`
+    - add the following text into the `.env`
+    ```
+    SQL_PASSWORD={insert password here}
+    FLASK_APP=Source/flask_app.py
+    ```
 6. Run `py update_sql.py`
     - This will attempt a sql connection and setup a database and insert some test data
-5. Run `flask run`
+7. Run `flask run`
     - This should start the flask server
     - Visit http://localhost:5000/
         - it should say 'hello world'
     - Visit http://localhost:5000/test
         - This should return the test data entered in step 6
+
+
 

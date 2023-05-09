@@ -21,6 +21,7 @@ def get_top5():
                 left join `AidCategories` AC on AI.categoryId = AC.id 
                 
             where R.date > date_add(CURDATE(), interval -90 day)
+                and R.itemId is not null
             group by AC.id
             order by num desc
             limit 5;
@@ -35,7 +36,7 @@ def get_top5():
     except Error as e:
         return e.msg
 
-@dashboardApi.route("/items/bottom5", methods=['GET'])
+@dashboardApi.route("/items/lowest5", methods=['GET'])
 def get_bottom5_items():
     bottom5 = []
     try:
@@ -62,15 +63,17 @@ def get_top10_items_distributed():
     top10 = []
     try:
         retrieveSql = '''
-            select summed.label, summed.num from
-                (select
-                    AI.name as `label`,
-                    sum(R.quantity) as `num`
-                from `Requisitions` R 
-                    left join `AidItems` AI on R.itemId = AI.id    
-                group by AI.id) as summed
+            select
+                AI.name as `label`,
+                sum(R.quantity) as `num`
+            from `Requisitions` R 
+                left join `AidItems` AI on R.itemId = AI.id    
+            where R.date > date_add(CURDATE(), interval -90 day)
+                and R.itemId is not null
+            group by AI.id
             order by num desc
             limit 10
+
         '''
         g.CURSOR.execute(retrieveSql)
 
@@ -82,8 +85,8 @@ def get_top10_items_distributed():
     except Error as e:
         return e.msg
 
-@dashboardApi.route("/items/top5", methods=['GET'])
-def get_top5_items_donated():
+@dashboardApi.route("/received/top5", methods=['GET'])
+def get_top5_items_recieved():
     top5 = []
     try:
         retrieveSql = '''
