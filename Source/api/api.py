@@ -13,6 +13,7 @@ from api.requisitionsApi import requisitionsApi
 from api.generalInformationApi import generalInformationApi
 from api.acquisitionsApi import acquisitionsApi
 from api.loginApi import loginApi
+from api.donorsApi import donorsApi
 
 api = Blueprint('api', __name__,  template_folder='templates')
 api.register_blueprint(categoriesApi)
@@ -23,3 +24,4 @@ api.register_blueprint(requisitionsApi)
 api.register_blueprint(generalInformationApi)
 api.register_blueprint(acquisitionsApi)
 api.register_blueprint(loginApi)
+api.register_blueprint(donorsApi)
