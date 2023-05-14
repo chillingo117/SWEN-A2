@@ -258,7 +258,7 @@ def createAndPopulateAcquisitionsTable(cursor, conn):
         create table `Acquisitions` (
             `id` int not null auto_increment,
             `itemId` int not null,
-            `donorId` int not null,
+            `donorId` int null,
             `quantity` int not null,
             `date` datetime not null,
             primary key (`id`),
