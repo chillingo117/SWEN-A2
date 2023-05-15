@@ -37,9 +37,12 @@ def get_kits():
         for kitId, kitName in kits:
             kitComponents = [relation for relation in relations if relation['kitId'] == kitId]
             maxKits = math.inf
-            for kitComponent in kitComponents:
-                componentsAvailable = math.floor(kitComponent['itemsAvailable'] / kitComponent['itemsPerKit'])
-                maxKits = min(componentsAvailable, maxKits)
+            if(len(kitComponents) > 0):
+                for kitComponent in kitComponents:
+                    componentsAvailable = math.floor(kitComponent['itemsAvailable'] / kitComponent['itemsPerKit'])
+                    maxKits = min(componentsAvailable, maxKits)
+            else:
+                maxKits = 0
 
             kitsAvailable.append({'kitId': kitId, 'kitName': kitName, 'numKits': maxKits})
 

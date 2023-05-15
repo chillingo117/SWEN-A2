@@ -13,7 +13,7 @@ def get_categories():
     categories = []
     try:
         retrieveSql = '''
-            select AC.`id` as `id`, ac.`name` as `name`, sum(AI.`amount`) as `itemAmount` from `AidCategories` as AC left join `AidItems` as AI
+            select AC.`id` as `id`, AC.`name` as `name`, sum(AI.`amount`) as `itemAmount` from `AidCategories` as AC left join `AidItems` as AI
             on AC.`id` = AI.`categoryId` group by AC.`id`
         '''
         g.CURSOR.execute(retrieveSql)
