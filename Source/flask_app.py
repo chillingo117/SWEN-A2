@@ -8,7 +8,7 @@ import os
 from api.api import api
 
 app = Flask(__name__)
-CORS(app)
+cors = CORS(app, origins=['http://localhost:5173', 'http://scrumtastic-squad:5173', 'http://192.168.1.[0-9]{1,3}:5173'])
 app.register_blueprint(api)
 
 @app.before_request
