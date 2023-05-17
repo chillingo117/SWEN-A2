@@ -35,7 +35,7 @@ def get_unassigned_acquisitions():
                 AI.name as itemName, 
                 A.quantity as quantity,
                 A.date as date
-            from acquisitions A 
+            from Acquisitions A 
                 left join AidItems AI
                 on A.itemId = AI.id
             where A.donorId is null
@@ -68,7 +68,7 @@ def get_acquisitions():
                 D.name as donorName,
                 A.quantity as quantity,
                 A.date as date
-            from acquisitions A 
+            from Acquisitions A 
                 left join AidItems AI
                 on A.itemId = AI.id
                 left join Donors D
