@@ -303,6 +303,38 @@ def createAndPopulatePasswordTable(cursor, conn):
     sqlDescription = 'Insert default Acquistions into acquistions table'
     executeSql(insertDefaultLoginsSql, sqlDescription, cursor, conn)
 
+def createDonorPITable(cursor, conn):
+    sql = ('''
+        create table `DonorPI` (
+            `id` int not null auto_increment,
+            `donorId` int not null,
+            `nationality` nvarchar(300) not null,
+            `docName` nvarchar(300) not null,
+            `docId` nvarchar(300) not null,
+            `docExpiry` nvarchar(300) not null,
+            primary key (`id`),
+            foreign key (`donorId`) references `Donors`(`id`)
+        )
+    ''')
+    sqlDescription = 'Create Donor PI table'
+    executeSql(sql, sqlDescription, cursor, conn)
+
+def createRecipientPITable(cursor, conn):
+    sql = ('''
+        create table `RecipientPI` (
+            `id` int not null auto_increment,
+            `recipientId` int not null,
+            `nationality` nvarchar(300) not null,
+            `docName` nvarchar(300) not null,
+            `docId` nvarchar(300) not null,
+            `docExpiry` nvarchar(300) not null,
+            primary key (`id`),
+            foreign key (`recipientId`) references `Recipients`(`id`)
+        )
+    ''')
+    sqlDescription = 'Create Recipients PI table'
+    executeSql(sql, sqlDescription, cursor, conn)
+
 
 def main():
     load_dotenv()
@@ -322,6 +354,8 @@ def main():
     createAndPopulateKitItemRelationshipTable(cursor, conn)
     createAndPopulateAcquisitionsTable(cursor, conn)
     createAndPopulatePasswordTable(cursor, conn)
+    createDonorPITable(cursor, conn)
+    createRecipientPITable(cursor, conn)
 
     cursor.close()
     conn.close()

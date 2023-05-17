@@ -9,7 +9,7 @@ import os
 donorsApi = Blueprint('donorsApi', __name__,  template_folder='templates')
 
 @donorsApi.route("/donors", methods=['GET'])
-def make_acquisition():
+def get_donors():
     try:
         sql = f'''
             select id, name from Donors
